@@ -7,48 +7,188 @@ import streamlit.components.v1 as components
 # --- 1. பக்கம் வடிவமைப்பு ---
 st.set_page_config(page_title="திருக்குறள் மின்னுலகம்", layout="centered", page_icon="✨")
 
-# --- 2. CSS டிசைன் ---
+# --- 2. CSS டிசைன் (MOBILE RESPONSIVE, SECURE UI & HIDING MENU) ---
 st.markdown("""
     <style>
-    h1 { color: #2e7d32; text-align: center; font-family: 'Helvetica', sans-serif; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    /* --- HIDE STREAMLIT BRANDING (TOP MENU & FOOTER) --- */
+    #MainMenu {visibility: hidden;}
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
+    .stDeployButton {display:none;}
     
-    div[role="radiogroup"] { background-color: #f1f8e9; padding: 10px; border-radius: 15px; border: 2px solid #a5d6a7; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-    div[role="radiogroup"] label { font-weight: 900 !important; font-size: 16px !important; color: #1b5e20 !important; background-color: white; padding: 8px 15px; border-radius: 10px; border: 1px solid #c8e6c9; margin: 0 !important; cursor: pointer; transition: all 0.3s; }
-    div[role="radiogroup"] label:hover { background-color: #c8e6c9; }
+    /* --- GENERAL HEADINGS --- */
+    h1 {
+        color: #2e7d32;
+        text-align: center;
+        font-family: 'Helvetica', sans-serif;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        margin-top: -50px; /* Adjust top margin since header is hidden */
+    }
 
-    .stChatInput textarea, .stTextInput > div > div > input { background-color: #ffffff !important; color: #000000 !important; border: 2px solid #4caf50 !important; border-radius: 15px !important; }
-    .stChatInput textarea:focus, .stTextInput > div > div > input:focus { border-color: #1b5e20 !important; box-shadow: 0 0 10px rgba(46, 125, 50, 0.2); }
+    /* --- HIGHLIGHTED MENU BOX (Mobile Responsive) --- */
+    div[role="radiogroup"] {
+        background-color: #f1f8e9; 
+        padding: 10px;
+        border-radius: 15px;
+        border: 2px solid #a5d6a7;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: center; 
+        flex-wrap: wrap; 
+        gap: 10px; 
+        margin-bottom: 20px;
+    }
+    
+    div[role="radiogroup"] label {
+        font-weight: 900 !important; 
+        font-size: 16px !important; 
+        color: #1b5e20 !important;
+        background-color: white;
+        padding: 8px 15px;
+        border-radius: 10px;
+        border: 1px solid #c8e6c9;
+        margin: 0 !important;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    div[role="radiogroup"] label:hover {
+        background-color: #c8e6c9;
+    }
 
-    [data-testid="stChatMessage"] { padding: 1rem; border-radius: 15px; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 90%; display: flex; flex-direction: column; }
-    [data-testid="stChatMessage"][data-testid="stChatMessageUser"] { margin-left: auto; background-color: #e8f5e9; border: 1px solid #c5e1a5; text-align: right; align-items: flex-end; }
-    [data-testid="stChatMessage"][data-testid="stChatMessageAssistant"] { margin-right: auto; background-color: #ffffff; border: 1px solid #e0e0e0; text-align: left; align-items: flex-start; }
+    /* --- CHAT INPUT & TEXT INPUT --- */
+    .stChatInput textarea, .stTextInput > div > div > input {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 2px solid #4caf50 !important;
+        border-radius: 15px !important;
+    }
+    .stChatInput textarea:focus, .stTextInput > div > div > input:focus {
+        border-color: #1b5e20 !important;
+        box-shadow: 0 0 10px rgba(46, 125, 50, 0.2);
+    }
 
-    .result-box { padding: 15px; border-radius: 12px; margin-bottom: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); width: 100%; text-align: left; }
+    /* --- CHAT BUBBLES --- */
+    [data-testid="stChatMessage"] {
+        padding: 1rem;
+        border-radius: 15px;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 90%; 
+        display: flex;
+        flex-direction: column;
+    }
+
+    [data-testid="stChatMessage"][data-testid="stChatMessageUser"],
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-user"]) {
+        margin-left: auto;
+        background-color: #e8f5e9;
+        border: 1px solid #c5e1a5;
+        text-align: right;
+        align-items: flex-end;
+    }
+    
+    [data-testid="stChatMessage"][data-testid="stChatMessageAssistant"],
+    div[data-testid="stChatMessage"]:has(div[data-testid="chatAvatarIcon-assistant"]) {
+        margin-right: auto;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    /* --- RESULT BOXES --- */
+    .result-box {
+        padding: 15px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        width: 100%;
+        text-align: left;
+    }
+
     .box-advice { background-color: #e3f2fd; border: 1px solid #90caf9; border-left: 5px solid #1976d2; }
     .box-kural { background-color: #e8f5e9; border: 1px solid #a5d6a7; border-left: 5px solid #2e7d32; }
     .box-solution { background-color: #fffde7; border: 1px solid #fff59d; border-left: 5px solid #fbc02d; }
     .box-consequence { background-color: #ffebee; border: 1px solid #ef9a9a; border-left: 5px solid #c62828; }
     
-    .box-header { font-family: 'Georgia', serif; font-size: 18px; font-weight: 900; margin-bottom: 8px; display: block; letter-spacing: 0.5px; }
-    .label-advice { color: #1565c0; } .label-solution { color: #f57f17; } .label-consequence { color: #c62828; }
-    .box-text { font-family: 'Verdana', sans-serif; font-size: 16px; line-height: 1.6; text-align: justify; font-weight: 500; color: #333; }
+    .box-header {
+        font-family: 'Georgia', serif;
+        font-size: 18px;
+        font-weight: 900;
+        margin-bottom: 8px;
+        display: block;
+        letter-spacing: 0.5px;
+    }
+    
+    .label-advice { color: #1565c0; }
+    .label-solution { color: #f57f17; }
+    .label-consequence { color: #c62828; }
 
-    .percentage-container { display: flex; flex-wrap: wrap; justify-content: space-around; background-color: #f1f8e9; border: 2px solid #a5d6a7; border-radius: 15px; padding: 15px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .percentage-item { font-size: 20px; font-weight: 900; margin: 5px; white-space: nowrap; }
+    .box-text {
+        font-family: 'Verdana', sans-serif;
+        font-size: 16px;
+        line-height: 1.6;
+        text-align: justify;
+        font-weight: 500;
+        color: #333;
+    }
+
+    /* Percentage Box Responsive */
+    .percentage-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        background-color: #f1f8e9;
+        border: 2px solid #a5d6a7;
+        border-radius: 15px;
+        padding: 15px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .percentage-item {
+        font-size: 20px;
+        font-weight: 900;
+        margin: 5px;
+        white-space: nowrap;
+    }
 
     .kural-meta { background-color: #c8e6c9; color: #1b5e20; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
     .kural-font { font-size: 19px; font-weight: 900; color: #1b5e20; line-height: 1.5; font-family: 'Times New Roman', serif; }
     .kural-meaning { margin-top: 10px; font-size: 16px; color: #33691e; border-top: 1px dashed #a5d6a7; padding-top: 8px; font-weight: bold; text-align: left;}
 
-    [data-testid="stBottom"] { bottom: 60px !important; background-color: transparent !important; z-index: 1000; }
-    .footer { position: fixed; left: 0; bottom: 0; width: 100%; height: 60px; background-color: #c5e1a5; color: #1b5e20; text-align: center; padding: 5px 0; border-top: 3px solid #2e7d32; z-index: 2000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center; }
+    /* --- FOOTER & INPUT POSITIONING --- */
+    [data-testid="stBottom"] {
+        bottom: 60px !important;
+        background-color: transparent !important;
+        z-index: 1000;
+    }
+
+    .footer {
+        position: fixed; 
+        left: 0; 
+        bottom: 0; 
+        width: 100%; 
+        height: 60px; 
+        background-color: #c5e1a5; 
+        color: #1b5e20; 
+        text-align: center; 
+        padding: 5px 0; 
+        border-top: 3px solid #2e7d32; 
+        z-index: 2000; 
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
     .footer p { margin: 2px 0 !important; font-size: 12px; font-weight: bold; line-height: 1.3; }
     div.block-container { padding-bottom: 150px; }
-    footer {visibility: hidden;} header {visibility: hidden;}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 3. SCROLL SCRIPT ---
+# --- 3. SCROLL SCRIPT (SMOOTH UI) ---
 scroll_script = """
 <script>
     function setupScrollListener() {
@@ -62,26 +202,27 @@ components.html(scroll_script, height=0, width=0)
 
 st.markdown("<h1>✨ திருக்குறள் மின்னுலகம் ✨</h1>", unsafe_allow_html=True)
 
-# --- 4. API & Config (SMART AUTO-SELECT MODEL) ---
-# புதிய KEY இங்கே உள்ளது
-GOOGLE_API_KEY = "AIzaSyDkUlugUApJBhv4CNgZXMt1adyb1CNqlDc"
+# --- 4. SECURE API & CONFIG (Secrets + Smart Model) ---
+if "GEMINI_API_KEY" in st.secrets:
+    GOOGLE_API_KEY = st.secrets["GEMINI_API_KEY"]
+else:
+    st.error("⚠️ API Key காணவில்லை! தயவுசெய்து Streamlit Secrets-ல் 'GEMINI_API_KEY' ஐ சேர்க்கவும்.")
+    st.stop()
 
 @st.cache_resource
 def load_smart_model(api_key):
     try:
         genai.configure(api_key=api_key)
         
-        # 1. API-ல் உள்ள அனைத்து மாடல்களையும் பட்டியலிடு
+        # 1. Get List of ALL available models for this key
         available_models = []
         try:
             for m in genai.list_models():
                 if 'generateContent' in m.supported_generation_methods:
                     available_models.append(m.name)
-        except:
-            pass
-
-        # 2. முன்னுரிமை: Flash > Pro > Others
-        # பெயரில் 'flash' உள்ளதா எனத் தேடுகிறது (சரியான பெயரை எடுக்க)
+        except: pass
+        
+        # 2. Try to find the best model (Flash first, then Pro)
         for m_name in available_models:
             if "flash" in m_name.lower():
                 return genai.GenerativeModel(m_name)
@@ -90,12 +231,12 @@ def load_smart_model(api_key):
             if "pro" in m_name.lower():
                 return genai.GenerativeModel(m_name)
 
-        # 3. எதுவும் கிடைக்கவில்லை என்றால், பட்டியலில் உள்ள முதல் மாடலை எடு
+        # 3. Fallback
         if available_models:
             return genai.GenerativeModel(available_models[0])
             
-        # 4. பட்டியல் வரவில்லை என்றால் Default பெயரை முயற்சி செய்
-        return genai.GenerativeModel("gemini-pro") 
+        # 4. Hard Fallback
+        return genai.GenerativeModel("gemini-1.5-flash")
     except: return None
 
 model = load_smart_model(GOOGLE_API_KEY)
