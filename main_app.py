@@ -18,9 +18,9 @@ st.markdown("""
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
 
-    /* --- CHAT INPUT FIX (Moves input box UP above footer) --- */
+    /* --- CHAT INPUT FIX --- */
     [data-testid="stBottom"] {
-        bottom: 80px !important; /* increased to clear footer */
+        bottom: 80px !important;
         background-color: transparent !important;
         z-index: 1000;
     }
@@ -63,23 +63,22 @@ st.markdown("""
     
     /* Header Style: Number + Adhigaaram */
     .kural-header {
-        background-color: #ffe0b2; /* Light Orange */
-        color: #e65100; /* Dark Orange Text */
+        background-color: #ffe0b2;
+        color: #e65100;
         padding: 6px 15px;
         border-radius: 20px;
         font-size: 15px;
-        font-weight: 900; /* Extra Bold */
+        font-weight: 900;
         display: inline-block;
         margin-bottom: 15px;
     }
 
     .kural-text { font-size: 22px; font-weight: 900; color: #1b5e20; margin-bottom: 6px; font-family: sans-serif; line-height: 1.5; }
     
-    /* Meaning Box & Bold Label Fix */
+    /* Meaning Box & Bold Label */
     .meaning-box { margin-top: 15px; font-size: 17px; color: #424242; line-height: 1.6; padding-top: 10px; border-top: 1px dashed #c8e6c9; }
-    
     .meaning-label { 
-        font-weight: 900 !important; /* EXTRA BOLD FIX */
+        font-weight: 900 !important;
         color: #1b5e20 !important; 
         font-size: 16px;
         text-transform: uppercase;
@@ -116,7 +115,7 @@ st.markdown("<h1>✨ திருக்குறள் மின்னுலக�
 st.caption("v1.0 | நவீன தமிழ் தொழில்நுட்பம்")
 
 # --- 3. API Key & Robust Model Setup ---
-# ⚠️ புதிய API Key இங்கே சேர்க்கப்பட்டுள்ளது ⚠️
+# ⚠️ புதிய API Key பயன்படுத்தப்பட்டுள்ளது ⚠️
 if "GEMINI_API_KEY" in st.secrets:
     GOOGLE_API_KEY = st.secrets["GEMINI_API_KEY"]
 else:
@@ -124,13 +123,13 @@ else:
 
 @st.cache_resource
 def get_gemini_model():
+    """நேரடியாக gemini-1.5-flash மாடலை அழைக்கிறது"""
     try:
         genai.configure(api_key=GOOGLE_API_KEY)
-        for m in genai.list_models():
-            if 'generateContent' in m.supported_generation_methods:
-                return genai.GenerativeModel(m.name)
-        return None
-    except:
+        # Direct Model Call - More Reliable
+        return genai.GenerativeModel("gemini-1.5-flash")
+    except Exception as e:
+        st.error(f"⚠️ API இணைப்பு பிழை: {e}") # பிழை விவரத்தைக் காட்டும்
         return None
 
 model = get_gemini_model()
@@ -150,21 +149,19 @@ def load_data():
 
 kurals_list = load_data()
 
-# Helper: JSON-ல் அதிகாரப் பெயரைத் தேடும் செயல்பாடு
 def get_adhigaaram(item):
-    # JSON-ல் இருக்கக்கூடிய சாத்தியமான பெயர்கள்
     keys = ['adhigaaram', 'adikaram', 'Chapter', 'chapter', 'paul_name', 'iyal']
     for k in keys:
         val = item.get(k)
         if val: return val
-    return "பொது" # எதுவும் இல்லையென்றால்
+    return "பொது"
 
 # --- மெனு ---
 selected_option = st.radio("", ["🔍 குறள் தேடல்", "⚖️ சூழல் தீர்ப்பு", "🤖 AI வள்ளுவர்"], horizontal=True)
 st.divider()
 
 # ==================================================
-# 1. குறள் தேடல் (FIXED: Adhigaaram & Bold Vilakkam)
+# 1. குறள் தேடல்
 # ==================================================
 if selected_option == "🔍 குறள் தேடல்":
     search_term = st.text_input("தேட வேண்டிய சொல்:", placeholder="எ.கா: நட்பு, முயற்சி")
@@ -178,9 +175,7 @@ if selected_option == "🔍 குறள் தேடல்":
             if results:
                 st.success(f"✅ {len(results)} குறள்கள் கிடைத்தன:")
                 for item in results:
-                    # FIX: Get Adhigaaram
                     adh_name = get_adhigaaram(item)
-                    
                     st.markdown(f"""
                     <div class="kural-card">
                         <div class="kural-header">
@@ -197,7 +192,7 @@ if selected_option == "🔍 குறள் தேடல்":
                 st.warning("குறள் இல்லை.")
 
 # ==================================================
-# 2. சூழல் தீர்ப்பு (FIXED: Adhigaaram & Bold Vilakkam)
+# 2. சூழல் தீர்ப்பு
 # ==================================================
 elif selected_option == "⚖️ சூழல் தீர்ப்பு":
     user_input = st.text_input("கேள்வி (எ.கா: கடன் வாங்கலாமா?):")
@@ -206,7 +201,7 @@ elif selected_option == "⚖️ சூழல் தீர்ப்பு":
         if not user_input:
             st.warning("கேள்வியைத் டைப் செய்யவும்.")
         elif not model:
-            st.error("AI இணைப்பு இல்லை (API Key சரிபார்க்கவும்).")
+            st.error("AI இணைப்பு இல்லை. மேலே உள்ள பிழைச் செய்தியைப் பார்க்கவும்.")
         else:
             with st.spinner("👨‍🦳 திருவள்ளுவர் ஆராய்கிறார்..."):
                 try:
@@ -253,14 +248,14 @@ elif selected_option == "⚖️ சூழல் தீர்ப்பு":
                         
                 except Exception as e:
                     if "403" in str(e):
-                        st.error("❌ பிழை: உங்கள் API Key முடக்கப்பட்டுள்ளது (Leaked). புதிய கீயைப் பயன்படுத்தவும்.")
+                        st.error("❌ பிழை: உங்கள் API Key முடக்கப்பட்டுள்ளது. புதிய கீயைப் பயன்படுத்தவும்.")
                     elif "429" in str(e):
                         st.error("⚠️ வள்ளுவர் ஓய்வெடுக்கிறார் (Quota Exceeded).")
                     else:
-                        st.error(f"பிழை: {e}")
+                        st.error(f"பிழை விவரம்: {e}")
 
 # ==================================================
-# 3. AI வள்ளுவர் (FIXED: Adhigaaram & Bold Vilakkam)
+# 3. AI வள்ளுவர் (Chat)
 # ==================================================
 elif selected_option == "🤖 AI வள்ளுவர்":
     if "messages" not in st.session_state:
@@ -343,11 +338,9 @@ elif selected_option == "🤖 AI வள்ளுவர்":
                         """, unsafe_allow_html=True)
                 except Exception as e:
                     if "403" in str(e):
-                        st.error("❌ பிழை: உங்கள் API Key முடக்கப்பட்டுள்ளது (Leaked). புதிய கீயைப் பயன்படுத்தவும்.")
-                    elif "429" in str(e):
-                        st.error("⚠️ API Limit Reached.")
+                        st.error("❌ பிழை: API Key லீக் ஆகிவிட்டது. புதிய கீயைப் பயன்படுத்தவும்.")
                     else:
-                        st.error("பிழை.")
+                        st.error(f"பிழை: {e}")
 
 # --- FOOTER (Fixed at Bottom) ---
 st.markdown("""
