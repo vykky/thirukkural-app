@@ -4,8 +4,37 @@ import os
 import google.generativeai as genai
 import streamlit.components.v1 as components
 
-# --- 1. பக்கம் வடிவமைப்பு ---
-st.set_page_config(page_title="திருக்குறள் மின்னுலகம்", layout="centered", page_icon="✨")
+# --- 3. SCROLL SCRIPT (SMOOTH UI) ---
+scroll_script = """
+<script>
+    function setupScrollListener() {
+        var chatInput = window.parent.document.querySelector('[data-testid="stBottom"]');
+        if(chatInput) { chatInput.style.opacity = '1'; }
+    }
+    setTimeout(setupScrollListener, 1000);
+</script>
+"""
+components.html(scroll_script, height=0, width=0)
+
+# 2. அறிமுகப் பெட்டி (Description Box)
+st.markdown("""
+    <div style="
+        background-color: #f1f8e9; 
+        border: 2px solid #a5d6a7; 
+        padding: 18px; 
+        border-radius: 15px; 
+        text-align: center; 
+        margin-bottom: 25px; 
+        color: #1b5e20; 
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <p style="margin: 0; font-size: 16px; line-height: 1.7; font-weight: 600; font-family: sans-serif;">
+            🚀 <b>2000 - ஆண்டு தமிழ் மறையை, இன்றைய செயற்கை நுண்ணறிவு (AI) தொழில்நுட்பத்துடன் இணைக்கும் ஒரு டிஜிட்டல் புரட்சி!</b> <br><br>
+            உங்கள் வாழ்வியல் கேள்விகளுக்கு <b>வள்ளுவரின் நேரடித் தீர்வு</b>, சூழலுக்கு ஏற்ற <b>வழிகாட்டுதல்</b> மற்றும் நவீன கால <b>‘AI வள்ளுவருடன்’ உரையாடும் வசதி</b> – அனைத்தும் உங்கள் விரல் நுனியில். 🌿
+        </p>
+    </div>
+""", unsafe_allow_html=True)
+
+# --- 4. SECURE API & CONFIG (Secrets + Smart Model) ---
 
 # --- 2. CSS டிசைன் (MOBILE RESPONSIVE, SECURE UI & HIDING MENU) ---
 st.markdown("""
@@ -203,11 +232,7 @@ components.html(scroll_script, height=0, width=0)
 st.markdown("<h1>✨ திருக்குறள் மின்னுலகம் ✨</h1>", unsafe_allow_html=True)
 
 # --- 4. SECURE API & CONFIG (Secrets + Smart Model) ---
-if "GEMINI_API_KEY" in st.secrets:
-    GOOGLE_API_KEY = st.secrets["GEMINI_API_KEY"]
-else:
-    st.error("⚠️ API Key காணவில்லை! தயவுசெய்து Streamlit Secrets-ல் 'GEMINI_API_KEY' ஐ சேர்க்கவும்.")
-    st.stop()
+GOOGLE_API_KEY = "AIzaSyDuajWOmBg_sLj-hkKFAsgtVHHcLWIjxGE"
 
 @st.cache_resource
 def load_smart_model(api_key):
